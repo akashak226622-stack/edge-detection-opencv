@@ -1,4 +1,6 @@
-# edge-detection-opencv
+# Exp-6--Record-EDGE-DETECTION
+
+## edge-detection-opencv
 
 ## Aim
 
@@ -49,99 +51,89 @@ Display all edge-detected images for comparison.
 
 ## Developed By
 
-- **Name:**  Vikamuhan Reddy
-- **Register No:** 212223240181
+- **Name:** Aman Nair
+- **Register No:** 212225240008
 
-```py
+~~~python
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Load image
-img = cv2.imread("C:/Users/vikam/OneDrive/Desktop/pic1.jpg")
-
-if img is None:
-    raise FileNotFoundError("Image not found. Check the image path.")
-
-# Convert to grayscale
+img = cv2.imread("img.jpg")
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-# 1. Sobel Edge Detection
-sobel_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
-sobel_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
-sobel = cv2.magnitude(sobel_x, sobel_y)
-sobel = cv2.convertScaleAbs(sobel)
+# Sobel operator
+sx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
+sy = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+sobel = cv2.convertScaleAbs(sx + sy)
 
-# 2. Prewitt Edge Detection
-prewitt_x = np.array([[-1, 0, 1],
-                      [-1, 0, 1],
-                      [-1, 0, 1]], dtype=np.float32)
+# Prewitt operator
+kx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+ky = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
+px = cv2.filter2D(gray, -1, kx)
+py = cv2.filter2D(gray, -1, ky)
+prewitt = cv2.addWeighted(px, 0.5, py, 0.5, 0)
 
-prewitt_y = np.array([[-1, -1, -1],
-                      [ 0,  0,  0],
-                      [ 1,  1,  1]], dtype=np.float32)
+# Roberts operator
+rx = np.array([[1, 0], [0, -1]])
+ry = np.array([[0, 1], [-1, 0]])
+roberts_x = cv2.filter2D(gray, -1, rx)
+roberts_y = cv2.filter2D(gray, -1, ry)
+roberts = cv2.addWeighted(roberts_x, 0.5, roberts_y, 0.5, 0)
 
-px = cv2.filter2D(gray, cv2.CV_32F, prewitt_x)
-py = cv2.filter2D(gray, cv2.CV_32F, prewitt_y)
-prewitt = cv2.magnitude(px, py)
-prewitt = cv2.convertScaleAbs(prewitt)
+# Laplacian operator
+laplacian = cv2.Laplacian(gray, cv2.CV_8U)
 
-# 3. Roberts Edge Detection
-roberts_x = np.array([[1, 0],
-                      [0, -1]], dtype=np.float32)
-
-roberts_y = np.array([[0, 1],
-                      [-1, 0]], dtype=np.float32)
-
-rx = cv2.filter2D(gray, cv2.CV_32F, roberts_x)
-ry = cv2.filter2D(gray, cv2.CV_32F, roberts_y)
-roberts = cv2.magnitude(rx, ry)
-roberts = cv2.convertScaleAbs(roberts)
-
-# 4. Laplacian Edge Detection
-laplacian = cv2.Laplacian(gray, cv2.CV_64F, ksize=3)
-laplacian = cv2.convertScaleAbs(laplacian)
-
-# 5. Canny Edge Detection
+# Canny edge detector
 canny = cv2.Canny(gray, 100, 200)
 
-# Display results
-titles = ["Original Image", "Grayscale", "Sobel",
-          "Prewitt", "Roberts", "Laplacian", "Canny"]
+# Display images
+images = [gray, sobel, prewitt, roberts, laplacian, canny]
+titles = ["Grayscale", "Sobel", "Prewitt", "Roberts", "Laplacian", "Canny"]
 
-images = [cv2.cvtColor(img, cv2.COLOR_BGR2RGB), gray,
-          sobel, prewitt, roberts, laplacian, canny]
+plt.figure(figsize=(10, 7))
 
-plt.figure(figsize=(12, 8))
-
-for i in range(len(images)):
-    plt.subplot(3, 3, i + 1)
-    plt.imshow(images[i], cmap="gray" if i != 0 else None)
+for i in range(6):
+    plt.subplot(2, 3, i + 1)
+    plt.imshow(images[i], cmap="gray")
     plt.title(titles[i])
     plt.axis("off")
 
 plt.tight_layout()
 plt.show()
-```
+~~~
 
-
+---
 
 ## Output
 
 ###  Sobel Edge Detector
-![alt text](image.png)
+- Detects edges in horizontal and vertical directions  
+- Produces gradient-based edge map  
 
 ###  Prewitt Edge Detector
-![alt text](image-1.png) 
+- Similar to Sobel but simpler kernel  
+- Detects directional edges  
 
 ###  Roberts Edge Detector
-![alt text](image-2.png) 
+- Detects edges using diagonal gradients  
+- Sensitive to noise  
 
 ###  Laplacian Edge Detector
-![alt text](image-3.png)
+- Detects edges using second-order derivatives  
+- Highlights rapid intensity changes  
 
 ###  Canny Edge Detector
-![alt text](image-4.png)
+- Multi-stage edge detection  
+- Produces clean and thin edges  
+
+
+<img width="1526" height="333" alt="image" src="https://github.com/user-attachments/assets/eb324bfa-8b3a-477b-a040-3a934e4e3f37" />
+
+<img width="1524" height="349" alt="image" src="https://github.com/user-attachments/assets/0e2e06f7-a8f0-4e1f-a287-71a81abb6606" />
+
+
 
 ---
 
